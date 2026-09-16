@@ -1,0 +1,6 @@
+﻿ref_des,comp_type,net_name,violation_type,severity,measured_value,standard_limit,recommendation
+C104,CAP_ELECTRO,HIGH_VOLT_48V,降额应力超标 (Over-Stress),CRITICAL,工作比: 93.0% (46.5V/50.0V),上限: 80.0%,建议更换耐压更高规格型号（如 >= 58.1V）
+C104,CAP_ELECTRO,HIGH_VOLT_48V,间距违规 (Clearance Violation),WARNING,0.18mm,下限: 0.25mm,优化 PCB 布线走线间距，防止高压拉弧击穿
+D401,DIODE_SCHOTTKY,POWER_INPUT,间距违规 (Clearance Violation),WARNING,0.16mm,下限: 0.25mm,优化 PCB 布线走线间距，防止高压拉弧击穿
+Q601,MOSFET_N_CH,POWER_DRV,降额应力超标 (Over-Stress),CRITICAL,工作比: 90.0% (36.0V/40.0V),上限: 80.0%,建议更换耐压更高规格型号（如 >= 45.0V）
+Q601,MOSFET_N_CH,POWER_DRV,间距违规 (Clearance Violation),WARNING,0.2mm,下限: 0.25mm,优化 PCB 布线走线间距，防止高压拉弧击穿

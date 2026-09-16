@@ -1,0 +1,66 @@
+{
+  "summary": {
+    "total_inspected_components": 13,
+    "passed_components": 10,
+    "violations_found": 5,
+    "pass_rate_pct": 76.92,
+    "coverage_rate_pct": 82.5
+  },
+  "performance_benchmark": {
+    "parsed_lines": 50000,
+    "duration_seconds": 0.209,
+    "throughput_lines_per_second": 239666.6
+  },
+  "violations": [
+    {
+      "ref_des": "C104",
+      "comp_type": "CAP_ELECTRO",
+      "net_name": "HIGH_VOLT_48V",
+      "violation_type": "降额应力超标 (Over-Stress)",
+      "severity": "CRITICAL",
+      "measured_value": "工作比: 93.0% (46.5V/50.0V)",
+      "standard_limit": "上限: 80.0%",
+      "recommendation": "建议更换耐压更高规格型号（如 >= 58.1V）"
+    },
+    {
+      "ref_des": "C104",
+      "comp_type": "CAP_ELECTRO",
+      "net_name": "HIGH_VOLT_48V",
+      "violation_type": "间距违规 (Clearance Violation)",
+      "severity": "WARNING",
+      "measured_value": "0.18mm",
+      "standard_limit": "下限: 0.25mm",
+      "recommendation": "优化 PCB 布线走线间距，防止高压拉弧击穿"
+    },
+    {
+      "ref_des": "D401",
+      "comp_type": "DIODE_SCHOTTKY",
+      "net_name": "POWER_INPUT",
+      "violation_type": "间距违规 (Clearance Violation)",
+      "severity": "WARNING",
+      "measured_value": "0.16mm",
+      "standard_limit": "下限: 0.25mm",
+      "recommendation": "优化 PCB 布线走线间距，防止高压拉弧击穿"
+    },
+    {
+      "ref_des": "Q601",
+      "comp_type": "MOSFET_N_CH",
+      "net_name": "POWER_DRV",
+      "violation_type": "降额应力超标 (Over-Stress)",
+      "severity": "CRITICAL",
+      "measured_value": "工作比: 90.0% (36.0V/40.0V)",
+      "standard_limit": "上限: 80.0%",
+      "recommendation": "建议更换耐压更高规格型号（如 >= 45.0V）"
+    },
+    {
+      "ref_des": "Q601",
+      "comp_type": "MOSFET_N_CH",
+      "net_name": "POWER_DRV",
+      "violation_type": "间距违规 (Clearance Violation)",
+      "severity": "WARNING",
+      "measured_value": "0.2mm",
+      "standard_limit": "下限: 0.25mm",
+      "recommendation": "优化 PCB 布线走线间距，防止高压拉弧击穿"
+    }
+  ]
+}

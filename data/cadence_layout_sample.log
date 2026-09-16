@@ -1,0 +1,33 @@
+======================================================================
+Cadence Design Systems, Inc. - Allegro PCB Design Expert (SPB 17.4-2024)
+Report Name : COMPONENT DETAILS AND NETLIST TESTABILITY REPORT
+Design Name : RADAR_SIGNAL_PROC_UNIT_REV_B3.BRD
+Generated   : Wed Sep 16 10:24:18 2026
+User        : Hardware_QA_Engineer
+======================================================================
+
+EDA TOOL BUILD NUMBER: 17.4-S032 (Windows-x64)
+TOTAL LAYERS         : 12 Layers (High Density Interconnect)
+SYSTEM STATUS        : PRE-FLIGHT TESTABILITY DRC VERIFICATION
+
+----------------------------------------------------------------------
+COMPONENT DETAILS LIST (PINS, NETS, ELECTRICAL PARAMETERS, CLEARANCE)
+----------------------------------------------------------------------
+REF_DES   COMP_TYPE       PACKAGE       NET_NAME         OPERATING_V   RATED_V   CLEARANCE   DRC_STATUS
+----------------------------------------------------------------------
+C101      CAP_CERAMIC     0603          VCC_3V3          3.3V          6.3V      0.22mm      OK
+C102      CAP_TANTALUM    1206          VCC_12V          12.0V         16.0V     0.20mm      WARNING_STRESS
+C103      CAP_CERAMIC     0402          VCC_1V8          1.8V          6.3V      0.18mm      OK
+C104      CAP_ELECTRO     CASE_D        HIGH_VOLT_48V    46.5V         50.0V     0.18mm      FAIL_CLEARANCE
+R201      RES_CHIP        0603          SDA_I2C          3.3V          50.0V     0.25mm      OK
+R202      RES_CHIP        0603          SCL_I2C          3.3V          50.0V     0.25mm      OK
+R203      RES_PRECISION   0805          SHUNT_SENSE      12.0V         100.0V    0.30mm      OK
+U301      IC_DSP_CORE     BGA256        VDD_CORE         1.0V          1.2V      0.16mm      OK
+U302      IC_LDO_REG      SOT223        VCC_5V           5.0V          6.0V      0.28mm      WARNING_STRESS
+D401      DIODE_SCHOTTKY  SOD123        POWER_INPUT      24.0V         40.0V     0.16mm      FAIL_CLEARANCE
+D402      DIODE_TVS       SMA           SURGE_PROTECT    12.0V         28.0V     0.35mm      OK
+L501      INDUCTOR_POWER  IND_7X7       SW_NODE          12.0V         50.0V     0.40mm      OK
+Q601      MOSFET_N_CH     SO8           POWER_DRV        36.0V         40.0V     0.20mm      FAIL_STRESS
+----------------------------------------------------------------------
+TOTAL COMPONENTS PROCESSED: 13 (SAMPLE BENCHMARK EXTRACT)
+======================================================================
