@@ -7,11 +7,20 @@ Cadence-Hardware-Log-Checker: EDA 硬件日志解析与测试性比对系统
 import os
 import time
 import json
+import tempfile
+import sys
 import pandas as pd
+
+if sys.platform.startswith("win"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 from core.log_parser import CadenceLogParser
 from core.knowledge_base import TestabilityKnowledgeBase
 from core.cross_checker import TestabilityCrossChecker
+from core.rule_extractor import TestabilityRuleExtractor
 
 
 def print_banner():
@@ -23,6 +32,22 @@ def print_banner():
 ================================================================================
 """
     print(banner)
+
+
+def resolve_output_dir(base_dir: str) -> str:
+    preferred = os.path.join(base_dir, "runtime_output")
+    try:
+        os.makedirs(preferred, exist_ok=True)
+        probe = os.path.join(preferred, ".write_probe")
+        with open(probe, "w", encoding="utf-8") as handle:
+            handle.write("ok")
+        os.remove(probe)
+        return preferred
+    except OSError:
+        fallback = os.path.join(tempfile.gettempdir(), "cadence_hardware_log_checker")
+        os.makedirs(fallback, exist_ok=True)
+        print(f"[WARN] 仓库运行目录不可写，报告改存到临时目录: {fallback}")
+        return fallback
 
 
 def generate_benchmark_log(file_path: str, n_lines: int = 50000):
@@ -66,15 +91,21 @@ def main():
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
     sample_log = os.path.join(base_dir, "data", "cadence_layout_sample.log")
-    benchmark_log = os.path.join(base_dir, "data", "cadence_benchmark_50k.log")
+    rules_path = os.path.join(base_dir, "data", "testability_rules_sample.json")
+    benchmark_log = os.path.join(tempfile.gettempdir(), "cadence_benchmark_50k.log")
     
-    out_components_csv = os.path.join(base_dir, "output", "cadence_parsed_components.csv")
-    out_violations_csv = os.path.join(base_dir, "output", "violations_summary.csv")
-    out_report_json = os.path.join(base_dir, "output", "testability_cross_check_report.json")
+    output_dir = resolve_output_dir(base_dir)
+    out_components_csv = os.path.join(output_dir, "cadence_parsed_components.csv")
+    out_violations_csv = os.path.join(output_dir, "violations_summary.csv")
+    out_report_json = os.path.join(output_dir, "testability_cross_check_report.json")
+    out_rules_json = os.path.join(output_dir, "extracted_rules.json")
 
     parser = CadenceLogParser()
     kb = TestabilityKnowledgeBase()
-    checker = TestabilityCrossChecker(kb=kb)
+    rule_snapshot = TestabilityRuleExtractor().extract_from_json(rules_path)
+    checker = TestabilityCrossChecker(kb=kb, rule_snapshot=rule_snapshot)
+    with open(out_rules_json, "w", encoding="utf-8") as f:
+        json.dump(rule_snapshot, f, ensure_ascii=False, indent=2)
 
     # [阶段 1] 真实业务场景样本日志解析
     print("[阶段 1] 正在流式解析现场真实 Cadence EDA 布局网表日志...")
@@ -129,6 +160,8 @@ def main():
                 "duration_seconds": round(cost_s, 3),
                 "throughput_lines_per_second": round(speed, 1)
             },
+            "parser_stats": parser.last_stats,
+            "rule_snapshot": rule_snapshot,
             "violations": violations
         }, f, ensure_ascii=False, indent=2)
 

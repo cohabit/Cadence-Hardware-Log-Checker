@@ -17,6 +17,7 @@ class CadenceLogParser:
             r'^\s*([CRULDQJ]\d+)\s+([A-Z0-9_\-]+)\s+([A-Z0-9_\-]+)\s+([A-Z0-9_]+)\s+([\d\.]+V?)\s+([\d\.]+V?)\s+([\d\.]+mm)\s*.*$',
             re.IGNORECASE
         )
+        self.last_stats = {}
 
     def parse_stream(self, lines: Generator[str, None, None]) -> pd.DataFrame:
         """
@@ -25,8 +26,10 @@ class CadenceLogParser:
         records = []
         in_data_table = False
         skipped_headers = 0
+        malformed_rows = 0
+        line_number = 0
 
-        for line in lines:
+        for line_number, line in enumerate(lines, 1):
             line_str = line.strip()
             
             # 检测数据表头起始标记
@@ -59,9 +62,18 @@ class CadenceLogParser:
                     "operating_voltage": op_v_num,
                     "rated_voltage": rated_v_num,
                     "clearance_mm": clearance_num
+                    ,"source_line": line_number
                 })
+            elif line_str and not line_str.startswith("-"):
+                malformed_rows += 1
 
         df = pd.DataFrame(records)
+        self.last_stats = {
+            "parsed_rows": len(records),
+            "skipped_headers": skipped_headers,
+            "malformed_rows": malformed_rows,
+            "total_lines": line_number,
+        }
         return df
 
     def parse_file(self, file_path: str) -> pd.DataFrame:
@@ -72,5 +84,5 @@ class CadenceLogParser:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             df = self.parse_stream(f)
         cost_ms = (time.time() - start_t) * 1000
-        print(f"[CadenceParser] 日志解析完成！共解析 {len(df)} 条元器件记录，耗时: {cost_ms:.1f}ms。")
+        print(f"[CadenceParser] 解析 {len(df)} 条元器件记录，耗时 {cost_ms:.1f}ms，异常行 {self.last_stats.get('malformed_rows', 0)}。")
         return df

@@ -27,6 +27,21 @@ class TestabilityKnowledgeBase:
                 return v["max_voltage_ratio"]
         return 0.80
 
+    def export_rules(self) -> dict:
+        return {
+            "version": "demo-1.0",
+            "rules": [
+                {
+                    "rule_id": f"DERATING-{name}",
+                    "comp_type": name,
+                    "max_voltage_ratio": data["max_voltage_ratio"],
+                    "min_clearance_mm": None,
+                    "description": data["desc"],
+                }
+                for name, data in self.derating_standards.items()
+            ]
+        }
+
     def get_min_clearance(self, net_name: str, op_volt: float) -> float:
         if op_volt >= 24.0 or "HIGH" in net_name.upper() or "48V" in net_name.upper():
             return self.clearance_standards["HIGH_VOLTAGE"]["min_clearance_mm"]

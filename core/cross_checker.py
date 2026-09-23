@@ -9,8 +9,9 @@ from .knowledge_base import TestabilityKnowledgeBase
 
 
 class TestabilityCrossChecker:
-    def __init__(self, kb: TestabilityKnowledgeBase = None):
+    def __init__(self, kb: TestabilityKnowledgeBase = None, rule_snapshot: Dict[str, Any] = None):
         self.kb = kb or TestabilityKnowledgeBase()
+        self.rule_snapshot = rule_snapshot or {}
 
     def run_check(self, df_components: pd.DataFrame) -> Dict[str, Any]:
         """
@@ -18,6 +19,7 @@ class TestabilityCrossChecker:
         """
         violations = []
         passed_count = 0
+        checked_dimensions = set()
 
         for _, row in df_components.iterrows():
             ref_des = row["ref_des"]
@@ -33,10 +35,12 @@ class TestabilityCrossChecker:
             if rated_v > 0:
                 stress_ratio = op_v / rated_v
                 limit_ratio = self.kb.get_derating_limit(comp_type)
+                checked_dimensions.add("voltage_derating")
                 
                 if stress_ratio > limit_ratio:
                     is_valid = False
                     violations.append({
+                        "rule_id": f"DERATING-{comp_type}",
                         "ref_des": ref_des,
                         "comp_type": comp_type,
                         "net_name": net_name,
@@ -49,9 +53,11 @@ class TestabilityCrossChecker:
 
             # 2. 空间爬电间距核验 (Clearance Check)
             min_clearance = self.kb.get_min_clearance(net_name, op_v)
+            checked_dimensions.add("clearance")
             if clearance < min_clearance:
                 is_valid = False
                 violations.append({
+                    "rule_id": "CLEARANCE-HIGH" if min_clearance >= 0.25 else "CLEARANCE-NORMAL",
                     "ref_des": ref_des,
                     "comp_type": comp_type,
                     "net_name": net_name,
@@ -73,7 +79,9 @@ class TestabilityCrossChecker:
             "passed_components": passed_count,
             "violations_found": len(violations),
             "pass_rate_pct": pass_rate,
-            "coverage_rate_pct": 82.5  # 核心业务测试场景覆盖率
+            "coverage_rate_pct": round(len(checked_dimensions) / 2 * 100, 2),
+            "checked_dimensions": sorted(checked_dimensions),
+            "rule_snapshot_version": self.rule_snapshot.get("version", "embedded-demo-rules"),
         }
 
         print(f"[CrossChecker] 交叉比对核验完成！核查元器件: {total} 个, 发现缺陷: {len(violations)} 处, 合规率: {pass_rate}%。")
